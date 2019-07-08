@@ -1,0 +1,11 @@
+venv
+*.pyc
+staticfiles
+*.swp
+migrations
+*.png
+db.sqlite3
+cookies.pkl
+ghostdriver.log
+*.xml
+**/.DS_Store

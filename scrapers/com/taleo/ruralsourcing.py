@@ -1,3 +1,4 @@
+import json
 import logging
 import requests
 
@@ -49,12 +50,25 @@ class RuralSourcingJobScraper(object):
         return jobs
 
     def scrape_job_description(self, job):
-        pass
-    
+        assert job['url'] != None, 'Job URL must be set'
+
+        resp = self.session.get(job['url'])
+        soup = BeautifulSoup(resp.text, 'html.parser')
+
+        d = soup.select('div.row')[1]
+
+        # Remove <script> from description
+        for s in d.find_all('script'):
+            s.extract()
+
+        job['description'] = str(d)
+        
     def scrape(self):
         jobs = self.scrape_job_links()
         for j in jobs:
             self.scrape_job_description(j)
+
+        print(json.dumps(jobs, indent=2))
 
 if __name__ == '__main__':
     scraper = RuralSourcingJobScraper()

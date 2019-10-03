@@ -4,22 +4,6 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-class JobScraper(object):
-    def __init__(self):
-        self.session = requests.Session()
-
-    def scrape_job_listings(self):
-        pass
-
-    def scrape_job_description(self, job):
-        pass
-
-    def scrape(self):
-        jobs = self.scrape_job_listings()
-        
-        for j in jobs:
-            self.scrape_job_description(j)
-            
 class SavannahStateJobScraper(object):
     def __init__(self):
         self.session = requests.Session()        
@@ -39,7 +23,7 @@ class SavannahStateJobScraper(object):
 
         d = soup.find('div', id='form_view')
 
-        job['description'] = str(d)
+        job['description'] = d.text.strip()
         
     def scrape_job_listings(self):
         jobs = []

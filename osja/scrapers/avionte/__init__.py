@@ -73,8 +73,11 @@ class AvionteJobScraper(object):
             
             resp = self.session.get(job_desc_api.format(j['jobPostIdEnc']), headers=job_desc_headers)
             json_data = resp.json()
-            desc = BeautifulSoup(json_data['description'], 'lxml')
             
+            desc = BeautifulSoup(json_data['description'], 'lxml')
+            for s in desc.find_all('script'):
+                s.extract()
+
             job['description'] = extract_text(desc)
             jobs.append(job)
 

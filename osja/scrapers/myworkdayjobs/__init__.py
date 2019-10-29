@@ -41,7 +41,7 @@ class MyWorkdayJobsJobScraper(object):
             data = resp.json()
 
             children = data['body']['children']
-
+            
             list_items = children[0]['children'][0]['listItems']
             end_points = children[0]['endPoints']
             
@@ -58,8 +58,9 @@ class MyWorkdayJobsJobScraper(object):
                 
             pagination = next(ep for ep in end_points if ep.get('type') == 'Pagination')
             pagination_count = children[0]['facetContainer']['paginationCount']
-
-            if pagination_count.get('value') == 0:
+            
+            if pagination_count.get('value') == 0 or \
+               pagination_count.get('value') == len(jobs):
                 break
 
             next_page = urljoin(self.url, pagination['uri']) + '/'

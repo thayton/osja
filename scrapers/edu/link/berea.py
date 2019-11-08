@@ -18,9 +18,9 @@ class BereaJobScraper(object):
         assert job['url'] is not None
 
         resp = self.session.get(job['url'])
-        soup = BeautifulSoup(resp.text, 'html.parser')
+        soup = BeautifulSoup(resp.text, 'lxml')
 
-        d = soup.find('div', id='form_view')
+        d = soup.select_one('div.careerSite > div.cs-atscs-jobdet-rtpane')
 
         job['description'] = d.text.strip()
 
@@ -77,11 +77,11 @@ class BereaJobScraper(object):
             elem_id = fields[-2]
 
             if elem_type == 'updatePanel':
-                html = resp.text[e:e+n]
+                html = f'<div id="{elem_id}">{resp.text[e:e+n]}</div>'
                 new_tree = BeautifulSoup(html, 'lxml')
                 
                 old_tree = soup.find(id=elem_id)
-                old_tree.replace_with(new_tree)
+                old_tree.replace_with(new_tree.div)
             else:
                 elem = soup.find(id=elem_id)
                 elem['value'] = resp.text[e:e+n]
@@ -134,7 +134,9 @@ class BereaJobScraper(object):
             soup = self.goto_page(soup, pageno)
             if soup == None:
                 break
-            
+
+            pageno += 1
+
         return jobs
 
     def scrape(self):

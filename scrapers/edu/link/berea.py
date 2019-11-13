@@ -24,7 +24,7 @@ class BereaJobScraper(object):
 
         job['description'] = d.text.strip()
 
-    def submit_aspnet_form(self, soup, event_target):
+    def collect_form_data(self, soup, event_target):
         form = soup.find('form', id='aspnetForm')
         data = {
             'ctl00$ScriptManager': f'ctl00$siteContent$widgetLayout$rptWidgets$ctl00$widgetContainer$ctl00$ctl00|{event_target}',
@@ -54,13 +54,9 @@ class BereaJobScraper(object):
             if v != None:
                 data[k] = v
 
-        headers = {
-            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36'
-        }
-        
-        resp = self.session.post(self.url, params=self.params, data=data, headers=headers)
-        data = {}
+        return data
 
+    def update_page(self, soup, resp):
         for t in [ r'\|(\d+)\|updatePanel\|ctl00_siteContent_widgetLayout_rptWidgets_ctl00_widgetContainer_ctl00_ctl00\|',
                    r'\|(\d+)\|hiddenField\|__VIEWSTATE\|',
                    r'\|(\d+)\|hiddenField\|__VIEWSTATEGENERATOR\|',
@@ -85,7 +81,16 @@ class BereaJobScraper(object):
             else:
                 elem = soup.find(id=elem_id)
                 elem['value'] = resp.text[e:e+n]
-            
+        
+    def submit_aspnet_form(self, soup, event_target):
+        headers = {
+            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36'
+        }
+        
+        data = self.collect_form_data(soup, event_target)
+        resp = self.session.post(self.url, params=self.params, data=data, headers=headers)
+
+        self.update_page(soup, resp)
         return soup
 
     def goto_page(self, soup, pageno):
@@ -115,14 +120,13 @@ class BereaJobScraper(object):
         jobs = []
 
         pageno = 2
-        
         soup = self.submit_search_form()
 
-        x = { 'class': 'CsLinkButton', 'id': re.compile(r'_linkResult') }
         r = re.compile(r'(JobDetails.aspx[^"]+)"')
+        x = 'div.widgetDropped[id="0"] ul > li > a.CsLinkButton'
         
         while True:
-            for a in soup.find_all('a', attrs=x):
+            for a in soup.select(x):
                 m = re.search(r, a['href'])
                 
                 job = {}

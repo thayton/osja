@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from urllib.parse import urljoin
 
-class SelectMindsJobScraper(object):
+class EygblJobScraper(object):
     def __init__(self):
         self.url = 'https://eygbl.referrals.selectminds.com'
         
@@ -156,13 +156,6 @@ class SelectMindsJobScraper(object):
         '''
         headers = {
             'tss-token': tss_token,
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36',
-            'X-Requested-With': 'XMLHttpRequest',
-            'Referer': 'https://eygbl.referrals.selectminds.com/jobs/search/{0}'.format(job_search_id),
-
-            'Accept': 'application/json, text/javascript, */*',
-            'Host': 'eygbl.referrals.selectminds.com',
-            'Origin': 'https://eygbl.referrals.selectminds.com'
         }
 
         params = {
@@ -230,7 +223,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--debug", help="Display debugging messages", action="store_true")
     
-    scraper = SelectMindsJobScraper()
+    scraper = EygblJobScraper()
     args = parser.parse_args()
 
     if args.debug:

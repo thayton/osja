@@ -3,7 +3,7 @@ import json
 import logging
 import requests
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Comment
 from urllib.parse import urljoin, urlparse, urlunparse, urlencode, unquote
 
 class JobScraper(object):
@@ -19,6 +19,9 @@ class JobScraper(object):
     def extract_text_from_soup(self, tag):
         for script in tag.find_all('script'):
             script.extract()
+
+        for comment in tag.find_all(text=lambda text: isinstance(text, Comment)):
+            comment.extract()
 
         desc = [ t.split() for t in tag.find_all(text=True) ]
         desc = [ ' '.join(l) for l in desc if len(l) > 0 ]

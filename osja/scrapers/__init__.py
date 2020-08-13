@@ -16,6 +16,9 @@ class JobScraper(object):
 
         self.session = requests.Session()
 
+    def delay(self):
+        time.sleep(0.5)
+
     def extract_text_from_soup(self, tag):
         for script in tag.find_all('script'):
             script.extract()
@@ -39,6 +42,7 @@ class JobScraper(object):
         jobs = self.scrape_job_links()
 
         for j in jobs:
+            self.delay()
             self.scrape_job_description(j)
 
         return jobs
